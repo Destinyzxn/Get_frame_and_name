@@ -1,0 +1,64 @@
+import os
+import glob
+import json
+def get_frame(file_path):
+    with open(file_path, 'r') as f:
+        res = f.read()
+        # print(res)
+        name = os.path.basename(file_path)
+    return res.count("CSF"),name
+    # print(res.find("CSF0f<0,1>"))
+
+
+def get_files_with_extension(folder_path, extension):
+    """
+    获取指定后缀名的文件列表
+    """
+    # 初始化一个空列表用于保存所有后缀名为extension的文件
+    files = []
+
+    # 遍历指定文件夹及其子文件夹下的所有文件
+    for root, dirs, filenames in os.walk(folder_path):
+        # 使用glob模块获取后缀名为extension的文件列表
+        for file in glob.glob(os.path.join(root, f"*.{extension}")):
+            # 将文件路径添加到列表中
+            file = os.path.abspath(file).replace("\\","/")
+            files.append(file)
+
+    return files
+
+
+def get_all_acd_files(path):
+    # path = "E:/animcraft/anim/kong"
+    extension = "acd"
+    all_file = get_files_with_extension(path,extension)
+    return all_file
+
+
+def main_fun():
+    frame_dict = {}
+    # current_file_path = os.path.abspath(__file__)
+    # print(current_file_path)
+    #
+    # current_dir = os.path.dirname(current_file_path)
+    current_dir = input("Enter path\n")
+    current_dir = os.path.abspath(current_dir).replace("\\","/")
+    # current_file_path = r"E:\animcraft\anim\kong"
+    all_file = get_all_acd_files(current_dir)
+    for i in all_file:
+        print(i)
+        frame, name = get_frame(i)
+        res = frame_dict.get(frame)
+        if res:
+            res.append(name)
+        else:
+            frame_dict[frame] = [name]
+    output_path = os.path.join(current_dir, "frame_data.txt").replace("\\", "/")
+    # data2 = json.dump(frame_dict)
+    with open(output_path, "w") as json_file:
+        json.dump(frame_dict, json_file, indent=4, ensure_ascii=False)
+        # frame_dict.setdefault(name)
+
+
+main_fun()
+
